@@ -1,0 +1,47 @@
+.painel-ao-vivo {
+  background: #0e1117;
+  color: white;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.lista-jogos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.jogo-card {
+  background: #161b22;
+  padding: 15px;
+  border-radius: 10px;
+  width: 280px;
+  box-shadow: 0 0 8px #222;
+}
+
+.jogo-nomes {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.barra-pressao {
+  height: 10px;
+  display: flex;
+  background: #222;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.barra1 {
+  background-color: #007b5f;
+}
+
+.barra2 {
+  background-color: #c2186a;
+}
+
+.tempo {
+  font-size: 12px;
+  color: #ccc;
+}

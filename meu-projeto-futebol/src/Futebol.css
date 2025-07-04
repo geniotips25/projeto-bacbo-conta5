@@ -1,0 +1,65 @@
+.painel-futebol {
+  padding: 20px;
+  background: #111;
+  color: #fff;
+  font-family: sans-serif;
+}
+
+.btn-on {
+  background: #0f0;
+  color: #000;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+.btn-off {
+  background: #900;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+.filtros select {
+  margin-left: 10px;
+  padding: 6px;
+  border-radius: 6px;
+}
+
+.lista-partidas {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card-jogo {
+  background: #222;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.linha-times {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo-time {
+  width: 28px;
+  height: 28px;
+}
+
+.detalhes {
+  margin-top: 6px;
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
+.mensagens-enviadas {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 10px;
+}
