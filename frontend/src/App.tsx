@@ -1,19 +1,19 @@
-import { Routes, Route, Link } from 'react-router-dom';
-import Resultados from './pages/Resultados';
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import Resultados from "./pages/Resultados";
+import Futebol from "./futebol/Futebol"; // ajuste se o nome do componente principal for diferente
 
 function App() {
   return (
-    <div className="p-4">
-      <nav className="mb-4 space-x-4">
-        <Link to="/" className="text-blue-500">Home</Link>
-        <Link to="/resultados" className="text-blue-500">Resultados</Link>
+    <Router>
+      <nav style={{ padding: "10px", display: "flex", gap: "10px" }}>
+        <Link to="/">Resultados</Link>
+        <Link to="/futebol">Futebol</Link>
       </nav>
-
       <Routes>
-        <Route path="/" element={<h1 className="text-xl">Página Inicial</h1>} />
-        <Route path="/resultados" element={<Resultados />} />
+        <Route path="/" element={<Resultados />} />
+        <Route path="/futebol" element={<Futebol />} />
       </Routes>
-    </div>
+    </Router>
   );
 }
 
