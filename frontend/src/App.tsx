@@ -1,31 +1,41 @@
-import { Routes, Route, BrowserRouter as Router, Link } from 'react-router-dom';
-import Resultados from './pages/Resultados';
-import Futebol from './components/Futebol';
-import LayoutBacbo from './components/LayoutBacbo';
-import Login from './pages/Login'; // Se estiver usando login
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-function App() {
+import AlertaAoVivo from "./components/AlertaAoVivo";
+import Login from "./Login";
+import LayoutBacbo from "./components/LayoutBacbo";
+
+import Funildeescanteiosde10minutosnabet365 from "./pages/Estrategias/Funildeescanteiosde10minutosnabet365";
+import EstrategiaFunilCantosNoLimite from "./pages/Estrategias/EstrategiaFunilCantosNoLimite";
+import EstrategiaAmbosMarcam from "./pages/Estrategias/EstrategiaAmbosMarcam";
+import EstrategiaZoiao from "./pages/Estrategias/EstrategiaZoiao";
+import EstrategiaOverHT from "./pages/Estrategias/EstrategiaOverHT";
+import EstrategiaGol1T from "./pages/Estrategias/EstrategiaGol1T";
+import EstrategiaFunilOverGol from "./pages/Estrategias/EstrategiaFunilOverGol";
+
+const App: React.FC = () => {
   return (
     <Router>
-      <div className="p-4">
-        <nav className="mb-4 space-x-4">
-          <Link to="/" className="text-blue-500">🏠 Home</Link>
-          <Link to="/resultados" className="text-blue-500">📊 Resultados</Link>
-          <Link to="/futebol" className="text-blue-500">⚽ Futebol</Link>
-          <Link to="/bacbo" className="text-blue-500">🎲 BacBo</Link>
-          <Link to="/login" className="text-blue-500">🔐 Login</Link> {/* opcional */}
-        </nav>
+      {/* Alerta global no topo */}
+      <AlertaAoVivo />
 
-        <Routes>
-          <Route path="/" element={<h1 className="text-xl">Página Inicial</h1>} />
-          <Route path="/resultados" element={<Resultados />} />
-          <Route path="/futebol" element={<Futebol />} />
-          <Route path="/bacbo" element={<LayoutBacbo />} />
-          <Route path="/login" element={<Login />} /> {/* opcional */}
-        </Routes>
-      </div>
+      <Routes>
+        {/* Rota pública */}
+        <Route path="/" element={<Login />} />
+
+        {/* Rota protegida com layout de estratégias */}
+        <Route path="/bacbo" element={<LayoutBacbo />}>
+          <Route path="funil-10min" element={<Funildeescanteiosde10minutosnabet365 />} />
+          <Route path="cantos-no-limite" element={<EstrategiaFunilCantosNoLimite />} />
+          <Route path="ambos-marcam" element={<EstrategiaAmbosMarcam />} />
+          <Route path="zoiao" element={<EstrategiaZoiao />} />
+          <Route path="over-ht" element={<EstrategiaOverHT />} />
+          <Route path="gol-1t" element={<EstrategiaGol1T />} />
+          <Route path="funil-over-gol" element={<EstrategiaFunilOverGol />} />
+        </Route>
+      </Routes>
     </Router>
   );
-}
+};
 
 export default App;

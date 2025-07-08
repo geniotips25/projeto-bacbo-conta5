@@ -77,3 +77,15 @@ export default function Futebol() {
     </div>
   );
 }
+import GraficosAoVivo from '@/components/Futebol/GraficosAoVivo';
+
+const Futebol = () => {
+  return (
+    <div className="min-h-screen bg-black text-white">
+      <h1 className="text-center text-2xl font-bold mt-4">Jogos Ao Vivo</h1>
+      <GraficosAoVivo />
+    </div>
+  );
+};
+
+export default Futebol;

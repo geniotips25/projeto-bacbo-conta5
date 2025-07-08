@@ -1,0 +1,11 @@
+frontend/
+└── src/
+    └── components/
+        └── Estrategias/
+            ├── Alerta.tsx
+            ├── EstrategiaAmbosMarcam.tsx
+            ├── EstrategiaFunilCantosNoLimite.tsx
+            ├── EstrategiaZoiao.tsx
+            ├── Funildeescanteiosde10minutosnabet365.tsx
+            ├── OverHTFunilnaBet365.tsx
+            └── PaginainicialEstrategia.tsx
