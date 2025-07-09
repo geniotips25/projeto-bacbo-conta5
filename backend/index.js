@@ -11,29 +11,53 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "*", // Permite acesso do frontend
+    origin: "*",
     methods: ["GET", "POST"],
   },
 });
 
-io.on("connection", (socket) => {
-  console.log("Novo cliente conectado:", socket.id);
+// Estado global de controle dos alertas
+let alertasAtivos = false;
 
-  // Enviar alerta ao cliente
-  socket.emit("alerta", {
-    mensagem: "⚠️ Estratégia Over HT detectada! APPM ≥ 2 e CG ≥ 5.",
-    jogo: "Time A vs Time B",
-  });
+// Socket.io conexão
+io.on("connection", (socket) => {
+  console.log("🟢 Novo cliente conectado:", socket.id);
 
   socket.on("disconnect", () => {
-    console.log("Cliente desconectado:", socket.id);
+    console.log("🔴 Cliente desconectado:", socket.id);
   });
 });
 
+// Endpoint de teste
 app.get("/api/ping", (req, res) => {
-  res.json({ status: "Backend online!" });
+  res.json({ status: "✅ Backend online!" });
 });
 
+// Endpoint para ativar ou desativar os alertas
+app.post("/toggle-alertas", (req, res) => {
+  const { ativo } = req.body;
+  alertasAtivos = ativo;
+  console.log("🔁 Alertas agora estão:", ativo ? "ATIVOS ✅" : "DESATIVADOS ❌");
+  res.json({ sucesso: true });
+});
+
+// Função para emitir alerta por socket
+function emitirAlertaSocket(jogo, mensagem) {
+  if (alertasAtivos) {
+    io.emit("alerta", { jogo, mensagem });
+    console.log("🚨 Alerta emitido para todos os clientes!");
+  } else {
+    console.log("🔕 Alertas desativados. Nenhum alerta enviado.");
+  }
+}
+
+// Exportar funções
+module.exports = {
+  emitirAlertaSocket,
+  getAlertasAtivos: () => alertasAtivos,
+};
+
+// Iniciar servidor
 server.listen(4000, () => {
   console.log("🚀 Servidor rodando em http://localhost:4000");
 });

@@ -12,6 +12,7 @@ import EstrategiaZoiao from "./pages/Estrategias/EstrategiaZoiao";
 import EstrategiaOverHT from "./pages/Estrategias/EstrategiaOverHT";
 import EstrategiaGol1T from "./pages/Estrategias/EstrategiaGol1T";
 import EstrategiaFunilOverGol from "./pages/Estrategias/EstrategiaFunilOverGol";
+import EstrategiaGolPrimeiroTempo from "./pages/Estrategias/EstrategiaGolPrimeiroTempo";
 
 const App: React.FC = () => {
   return (
@@ -32,6 +33,7 @@ const App: React.FC = () => {
           <Route path="over-ht" element={<EstrategiaOverHT />} />
           <Route path="gol-1t" element={<EstrategiaGol1T />} />
           <Route path="funil-over-gol" element={<EstrategiaFunilOverGol />} />
+          <Route path="gol-primeiro-tempo" element={<EstrategiaGolPrimeiroTempo />} />
         </Route>
       </Routes>
     </Router>

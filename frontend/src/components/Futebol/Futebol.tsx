@@ -1,3 +1,4 @@
+import AtivarAlertas from "./AtivarAlertas";
 // src/pages/Estrategias/EstrategiaOverHT.tsx
 import React from "react";
 import Alerta from "../../components/Futebol/Alerta";
