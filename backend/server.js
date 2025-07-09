@@ -1,64 +1,112 @@
-const express = require("express");
-const http = require("http");
-const cors = require("cors");
-const axios = require("axios");
-const { Server } = require("socket.io");
-
+const express = require('express');
+const cors = require('cors');
+const axios = require('axios');
 const app = express();
+
 app.use(cors());
-app.use(express.json());
+app.use(express.json()); // ✅ necessário para receber JSON via POST
 
-const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"],
-  },
-});
+const PORT = 4000;
 
-// ✅ Função para enviar alerta ao Telegram e frontend
-const enviarAlerta = async (alerta) => {
-  const mensagem = `
-🚨 *ALERTA DE ESTRATÉGIA*: ${alerta.estrategia}
-🕑 ${alerta.horario}
-🏟️ ${alerta.jogo}
-📊 APPM: ${alerta.appm}
-📈 CG: ${alerta.cg}
-🔍 [Pesquisar no Google](${alerta.linkGoogle})
-`;
+// ✅ API-KEY da API-FOOTBALL
+const API_KEY = '09fd0ddab95ec7a0cd51baa934e36d60';
+const BASE_URL = 'https://v3.football.api-sports.io';
 
+// ✅ Dados do bot do Telegram
+const TELEGRAM_BOT_TOKEN = '7442744473:AAFGcySvF6QuViSb0GeORRP-IXxS24sunQ';
+const TELEGRAM_CHAT_ID = '-1001867650697';
+
+// 🚨 Função para enviar alerta ao Telegram
+const enviarAlertaTelegram = async (mensagem) => {
   try {
-    // ✅ Envia para o Telegram usando o token do seu bot
-    await axios.post(
-      `https://api.telegram.org/bot8081957399:AAHrNotDuFgx1M5Zo8mBXKEcjGYzS88_8Pc/sendMessage`,
-      {
-        chat_id: "-1867650697",     // ID do seu canal/grupo atualizado
-        text: mensagem,
-        parse_mode: "Markdown",
-        disable_web_page_preview: true
-      }
-    );
-    console.log("✅ Alerta enviado para o Telegram");
-  } catch (err) {
-    console.error("❌ Erro ao enviar para o Telegram:", err.response?.data || err.message);
+    await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      chat_id: TELEGRAM_CHAT_ID,
+      text: mensagem,
+      parse_mode: 'HTML',
+    });
+    console.log('✅ Alerta enviado com sucesso');
+  } catch (error) {
+    console.error('❌ Erro ao enviar alerta:', error.message);
   }
-
-  // ✅ Envia para o frontend via WebSocket
-  io.emit("alerta-estrategia", alerta);
 };
 
-// ✅ Endpoint público para envio de alertas
-app.post("/enviar-alerta", (req, res) => {
-  const alerta = req.body;
-  enviarAlerta(alerta);
-  res.send({ status: "ok" });
+// ✅ Rota básica
+app.get('/', (req, res) => {
+  res.send('✅ API Futebol está online');
 });
 
-// ✅ WebSocket
-io.on("connection", (socket) => {
-  console.log("✅ Cliente conectado via WebSocket");
+// ✅ Rota GET para buscar jogos e verificar estratégia
+app.get('/api/jogos', async (req, res) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/fixtures`, {
+      params: { live: 'all' },
+      headers: { 'x-apisports-key': API_KEY },
+    });
+
+    const data = response.data.response;
+
+    const jogosFiltrados = data.map((jogo) => {
+      const tempo = jogo.fixture.status.elapsed || 0;
+
+      // 🔁 Simulando APPM e CG
+      const APPM = Math.floor(Math.random() * 4);
+      const CG = Math.floor(Math.random() * 10);
+      const balanceamentoOdds = Math.floor(Math.random() * 10);
+      const jogoImportante = true;
+      const timeOfensivo = true;
+
+      const atendeCriterios =
+        APPM >= 2 &&
+        CG >= 5 &&
+        balanceamentoOdds >= 6 &&
+        jogoImportante &&
+        timeOfensivo &&
+        tempo >= 10;
+
+      if (atendeCriterios) {
+        const mensagem = `⚽ <b>ALERTA DE ESTRATÉGIA</b>\n\n` +
+          `🏆 Liga: ${jogo.league.name}\n` +
+          `⏱️ Tempo: ${tempo} minutos\n` +
+          `🔴 ${jogo.teams.home.name} vs ${jogo.teams.away.name}\n` +
+          `📊 APPM: ${APPM} | CG: ${CG} | Odds: ${balanceamentoOdds}\n` +
+          `🔍 <a href="https://www.google.com/search?q=${jogo.teams.home.name}">Buscar Jogo no Google</a>`;
+
+        enviarAlertaTelegram(mensagem);
+      }
+
+      return {
+        liga: jogo.league.name,
+        tempo: `${tempo}'`,
+        casa: jogo.teams.home.name,
+        fora: jogo.teams.away.name,
+        golsCasa: jogo.goals.home,
+        golsFora: jogo.goals.away,
+        APPM,
+        CG,
+        estrategias: atendeCriterios ? 1 : 0,
+      };
+    });
+
+    res.json(jogosFiltrados.slice(0, 20));
+  } catch (error) {
+    console.error('Erro ao buscar dados da API-FOOTBALL:', error.message);
+    res.status(500).json({ erro: 'Erro ao buscar dados da API-FOOTBALL' });
+  }
 });
 
-server.listen(4000, () => {
-  console.log("🚀 Backend rodando na porta 4000");
+// ✅ Rota POST para alertas manuais (frontend)
+app.post('/api/enviar-alerta', async (req, res) => {
+  const { mensagem } = req.body;
+
+  try {
+    await enviarAlertaTelegram(mensagem);
+    res.status(200).send({ success: true });
+  } catch (error) {
+    console.error('❌ Erro ao enviar alerta manual:', error.message);
+    res.status(500).send({ success: false, error: error.message });
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`🚀 Backend rodando na porta ${PORT}`);
 });

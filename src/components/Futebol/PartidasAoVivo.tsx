@@ -1,75 +1,58 @@
 import React, { useEffect, useState } from 'react';
 import { fetchLiveMatches } from '@/services/apiFootball';
 
-interface Time {
-  name: string;
-  logo: string;
-}
-
-interface Fixture {
-  fixture: {
-    id: number;
-    status: { elapsed: number };
-  };
-  league: {
-    name: string;
-  };
+interface Match {
+  fixture: { id: number; status: { elapsed: number } };
+  league: { name: string; country: string; logo: string };
   teams: {
-    home: Time;
-    away: Time;
+    home: { name: string; logo: string };
+    away: { name: string; logo: string };
   };
-  goals: {
-    home: number;
-    away: number;
-  };
+  goals: { home: number; away: number };
 }
 
 const PartidasAoVivo: React.FC = () => {
-  const [jogos, setJogos] = useState<Fixture[]>([]);
+  const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const carregarPartidas = async () => {
-      try {
-        const data = await fetchLiveMatches();
-        setJogos(data.slice(0, 10)); // apenas 10 partidas
-      } catch (error) {
-        console.error('Erro ao carregar partidas:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    carregarPartidas();
+    async function load() {
+      const data = await fetchLiveMatches();
+      setMatches(data.slice(0, 20)); // ✅ Exibe até 20 jogos
+      setLoading(false);
+    }
+    load();
   }, []);
 
-  if (loading) return <p>Carregando partidas ao vivo...</p>;
+  if (loading) return <p className="text-center mt-6 text-gray-600">Carregando jogos ao vivo...</p>;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-      {jogos.map((jogo) => (
-        <div key={jogo.fixture.id} className="bg-white shadow rounded-xl p-4 border-l-4 border-green-600">
-          <h2 className="text-sm font-semibold text-gray-600">{jogo.league.name}</h2>
-          <p className="text-xs text-gray-500">⏱ {jogo.fixture.status.elapsed}'</p>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-6">
+      {matches.map((m) => (
+        <div
+          key={m.fixture.id}
+          className="bg-white rounded-xl shadow hover:shadow-md p-4 border-l-4 border-green-400"
+        >
+          <div className="text-sm text-gray-600 font-semibold">{m.league.name}</div>
+          <div className="text-xs text-gray-500 mb-2">⏱ {m.fixture.status.elapsed}'</div>
 
-          <div className="flex items-center justify-between mt-2 mb-1">
+          <div className="flex justify-between items-center mt-1">
             <div className="flex items-center gap-2">
-              <img src={jogo.teams.home.logo} alt="logo" className="w-5 h-5" />
-              <span>{jogo.teams.home.name}</span>
+              <img src={m.teams.home.logo} className="w-5 h-5" alt={m.teams.home.name} />
+              <span>{m.teams.home.name}</span>
             </div>
-            <span className="font-bold text-lg">{jogo.goals.home}</span>
+            <span className="font-bold">{m.goals.home}</span>
           </div>
 
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex justify-between items-center mt-1">
             <div className="flex items-center gap-2">
-              <img src={jogo.teams.away.logo} alt="logo" className="w-5 h-5" />
-              <span>{jogo.teams.away.name}</span>
+              <img src={m.teams.away.logo} className="w-5 h-5" alt={m.teams.away.name} />
+              <span>{m.teams.away.name}</span>
             </div>
-            <span className="font-bold text-lg">{jogo.goals.away}</span>
+            <span className="font-bold">{m.goals.away}</span>
           </div>
 
-          <p className="text-green-700 text-sm font-medium mb-1">3 Estratégias Ativas</p>
-          <button className="text-sm text-blue-600 hover:underline">Ver Detalhes</button>
+          <button className="mt-3 text-sm text-blue-600 hover:underline">Ver Detalhes</button>
         </div>
       ))}
     </div>

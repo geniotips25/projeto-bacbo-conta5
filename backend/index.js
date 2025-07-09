@@ -1,63 +1,36 @@
-const express = require("express");
-const http = require("http");
-const cors = require("cors");
-const { Server } = require("socket.io");
-
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const axios = require('axios');
 const app = express();
+const PORT = 4000;
+
+// ✅ Dados do bot do Telegram
+const TELEGRAM_BOT_TOKEN = '7442744473:AAFGcySvF6QuViSb0GeORRP-IXxS24sunQ';
+const TELEGRAM_CHAT_ID = '-1001867650697';
+
 app.use(cors());
-app.use(express.json());
+app.use(bodyParser.json());
 
-const server = http.createServer(app);
-
-const io = new Server(server, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"],
-  },
-});
-
-// Estado global de controle dos alertas
-let alertasAtivos = false;
-
-// Socket.io conexão
-io.on("connection", (socket) => {
-  console.log("🟢 Novo cliente conectado:", socket.id);
-
-  socket.on("disconnect", () => {
-    console.log("🔴 Cliente desconectado:", socket.id);
-  });
-});
-
-// Endpoint de teste
-app.get("/api/ping", (req, res) => {
-  res.json({ status: "✅ Backend online!" });
-});
-
-// Endpoint para ativar ou desativar os alertas
-app.post("/toggle-alertas", (req, res) => {
-  const { ativo } = req.body;
-  alertasAtivos = ativo;
-  console.log("🔁 Alertas agora estão:", ativo ? "ATIVOS ✅" : "DESATIVADOS ❌");
-  res.json({ sucesso: true });
-});
-
-// Função para emitir alerta por socket
-function emitirAlertaSocket(jogo, mensagem) {
-  if (alertasAtivos) {
-    io.emit("alerta", { jogo, mensagem });
-    console.log("🚨 Alerta emitido para todos os clientes!");
-  } else {
-    console.log("🔕 Alertas desativados. Nenhum alerta enviado.");
+// ✅ Endpoint para envio de alerta manual
+app.post('/send-alert', async (req, res) => {
+  const { message } = req.body;
+  try {
+    await axios.post(
+      `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
+      {
+        chat_id: TELEGRAM_CHAT_ID,
+        text: message,
+        parse_mode: 'Markdown',
+      }
+    );
+    res.status(200).send('✅ Alerta enviado!');
+  } catch (error) {
+    console.error('❌ Erro ao enviar para o Telegram:', error);
+    res.status(500).send('Erro ao enviar alerta');
   }
-}
+});
 
-// Exportar funções
-module.exports = {
-  emitirAlertaSocket,
-  getAlertasAtivos: () => alertasAtivos,
-};
-
-// Iniciar servidor
-server.listen(4000, () => {
-  console.log("🚀 Servidor rodando em http://localhost:4000");
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
 });
