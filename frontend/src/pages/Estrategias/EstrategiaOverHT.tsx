@@ -2,7 +2,7 @@ import React from "react";
 import { Card } from "@/components/ui/card";
 import { AlertTriangle } from "lucide-react";
 
-const EstrategiaOverHT = () => {
+const EstrategiaOverHT: React.FC = () => {
   return (
     <div className="p-6 bg-gray-900 min-h-screen text-white">
       <h1 className="text-3xl font-bold mb-4">Estratégia Over HT</h1>
