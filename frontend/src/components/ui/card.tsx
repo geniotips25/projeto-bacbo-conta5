@@ -6,10 +6,12 @@ interface CardProps {
   className?: string;
 }
 
-export const Card: React.FC<CardProps> = ({ children, className }) => {
+const Card: React.FC<CardProps> = ({ children, className }) => {
   return (
     <div className={classNames("rounded-xl p-4 bg-white shadow-md", className)}>
       {children}
     </div>
   );
 };
+
+export default Card;
